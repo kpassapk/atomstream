@@ -1,10 +1,4 @@
 (ns atomstream.impl.web
-  "Hyperlith web front-end for an atomstream app.
-
-   Generic: it renders whatever ANSI string the app's `view` last produced
-   (converted to hiccup) into a <pre>, and forwards browser keystrokes back
-   into charm's event loop as key-press messages. The app's init/update/view
-   are never modified."
   (:require [atomstream.impl.ansi-html :as ah]
             [charm.message :as msg]
             [charm.program :as prog]
@@ -28,15 +22,15 @@
 (defn- web-key->charm [k]
   ;; Browser KeyboardEvent.key -> the key strings charm's key-match? expects.
   (case k
-    "ArrowUp"    "up"
-    "ArrowDown"  "down"
-    "ArrowLeft"  "left"
-    "ArrowRight" "right"
-    "Enter"      "enter"
-    "Escape"     "esc"
-    "Backspace"  "backspace"
-    "Tab"        "tab"
-    " "          "space"
+    "ArrowUp"    :up
+    "ArrowDown"  :down
+    "ArrowLeft"  :left
+    "ArrowRight" :right
+    "Enter"      :enter
+    "Escape"     :escape
+    "Backspace"  :backspace
+    "Tab"        :tab
+    "Shift"      :shift
     k))
 
 ;; ---------------------------------------------------------------------------
@@ -95,10 +89,6 @@
 ;; ---------------------------------------------------------------------------
 
 (defn run-with-web
-  "Run a charm program (same opts as charm.core/run) and, alongside the TUI,
-   serve it on the web. The app is untouched: we wrap its init/update to inject
-   web keystrokes via a re-armed channel command, and wrap its view to capture
-   the ANSI string the web renders."
   [{:keys [init update view port] :or {port 8080} :as opts}]
   (let [ext-ch  (a/chan 256)
         sub-cmd (prog/cmd #(a/<!! ext-ch))]   ; blocks for next web event; re-armed each cycle

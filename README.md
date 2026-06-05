@@ -5,6 +5,8 @@
 [charm]: https://github.com/TimoKramer/charm.clj
 [hyperlith]: https://github.com/andersmurphy/hyperlith
 
+![Atomstream demo](docs/demo.gif)
+
 ## Usage
 
 Atomstream is a drop-in replacement for charm.clj. 
