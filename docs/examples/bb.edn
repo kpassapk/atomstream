@@ -1,0 +1,32 @@
+{:paths ["src" "../../src"]
+ :deps {com.lambdaisland/launchpad {:mvn/version "0.45.201-alpha"}}
+ :tasks
+ {cheatsheet {:doc "Run cheatsheet example"
+              :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.cheatsheet")}
+
+  countdown {:doc "Run countdown example"
+             :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.countdown")}
+
+  counter {:doc "Run counter example"
+           :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.counter")}
+
+  download {:doc "Run download example"
+            :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.download")}
+
+  file-browser {:doc "Run file browser example"
+                :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.file-browser")}
+
+  form {:doc "Run form example"
+        :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.form")}
+
+  pomodoro {:doc "Run pomodoro example"
+            :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.pomodoro")}
+
+  spinner {:doc "Run spinner demo"
+           :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.spinner-demo")}
+
+  timer {:doc "Run timer example"
+         :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.timer")}
+
+  todos {:doc "Run todos example"
+         :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.todos")}}}
