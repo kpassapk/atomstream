@@ -1,6 +1,8 @@
 # Atomstream
 
-[charm.clj][charm], but also renders to the Web with [hyperlith][hyperlith]
+TUIs are easy and fun to code, but they are not easy to share with friends or colleagues. It is also hard to implement accessibility features for TUIs.
+
+Builds on [charm.clj][charm], renders to the Web with [hyperlith][hyperlith].
 
 [charm]: https://github.com/TimoKramer/charm.clj
 [hyperlith]: https://github.com/andersmurphy/hyperlith
