@@ -1,4 +1,4 @@
-(ns examples.emojis
+(ns ^{:atomstream/icon "😀"} examples.emojis
   "Demonstrates grapheme cluster width handling with emoji in tables and borders.
 
    Shows that ZWJ sequences, flags, and skin-tone emoji are measured correctly

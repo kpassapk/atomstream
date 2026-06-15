@@ -108,7 +108,6 @@
           web         (h/start-app {:ctx-start (fn [] {})
                                     :ctx-stop  (fn [_] nil)
                                     :port      port})]
-      (println (str "atomstream web: http://localhost:" port))
       (try
         (prog/run (assoc opts :init wrap-init :update wrap-update :view wrap-view))
         (finally

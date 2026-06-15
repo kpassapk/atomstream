@@ -1,4 +1,4 @@
-(ns examples.todos
+(ns ^{:atomstream/icon "✅"} examples.todos
   "Full todo application demonstrating component composition:
    list + text-input + help working together."
   (:require

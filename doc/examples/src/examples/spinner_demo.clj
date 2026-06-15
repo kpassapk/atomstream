@@ -1,4 +1,4 @@
-(ns examples.spinner-demo
+(ns ^{:atomstream/icon "🌀"} examples.spinner-demo
   "Demonstrates all 14 spinner animation types side by side."
   (:require
    [atomstream.components.spinner :as spinner]

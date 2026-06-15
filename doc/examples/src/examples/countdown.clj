@@ -1,4 +1,4 @@
-(ns examples.countdown
+(ns ^{:atomstream/icon "⏳"} examples.countdown
   "Countdown timer demonstrating timer component with start/stop controls."
   (:require
    [atomstream.components.timer :as timer]

@@ -1,4 +1,4 @@
-(ns examples.timer
+(ns ^{:atomstream/icon "⏱️"} examples.timer
   "Simple CLI timer - 'sleep with progress'.
 
    Usage:

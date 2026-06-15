@@ -21,3 +21,6 @@ classes/
 
 .claude/
 timer
+deps.local.edn
+/.agent-shell/
+.agent-shell/

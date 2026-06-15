@@ -1,4 +1,4 @@
-(ns examples.counter
+(ns ^{:atomstream/icon "🔢"} examples.counter
   (:require
    [atomstream.message :as msg]
    [atomstream.program :as program]

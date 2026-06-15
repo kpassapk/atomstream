@@ -1,2 +1,4 @@
 {:paths ["src"]
- :deps {kpassapk/atomstream {:local/root "../../"}}}
+ :deps {kpassapk/atomstream {:local/root "../../"}}
+ :aliases
+ {:sci {:extra-deps {org.babashka/sci {:mvn/version "0.12.51"}}}}}

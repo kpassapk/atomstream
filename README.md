@@ -2,18 +2,16 @@
 
 TUIs are easy and fun to code, but they are not easy to share with friends or colleagues. It is also hard to implement accessibility features for TUIs.
 
-Builds on [charm.clj][charm], renders to the Web with [hyperlith][hyperlith].
+Atomstream is a drop-in replacement for [charm.clj][charm], which also renders to the Web with [hyperlith][hyperlith].
 
 [charm]: https://github.com/TimoKramer/charm.clj
 [hyperlith]: https://github.com/andersmurphy/hyperlith
 
-![Atomstream demo](docs/demo.gif)
+![Atomstream demo](doc/demo.gif)
 
 ## Usage
 
-Atomstream is a drop-in replacement for charm.clj. 
-
-1. In your charm.clj program, replace `charm` with `atomstream`. 
+1. In your charm.clj program, replace `charm` with `atomstream`:
 
 ```
 (require '[atomstream.program :as program]   ;; was charm.program — run/run-async also render to the web
@@ -33,9 +31,20 @@ Atomstream is a drop-in replacement for charm.clj.
 
 ## Try it!
 
+Run the example launcher:
+
 ```
-cd examples
+cd doc/examples
+bb launcher
+```
+Then open http://localhost:8080
+
+You can also run individual examples:
+
+```
+cd doc/examples
 bb tasks
+bb cheatsheet       # etc
 ```
 
 # Roadmap
@@ -44,5 +53,3 @@ bb tasks
 - Themes
 - CLI
 - (Maybe) custom components with special rendering for the Web
-
-

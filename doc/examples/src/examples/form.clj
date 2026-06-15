@@ -1,4 +1,4 @@
-(ns examples.form
+(ns ^{:atomstream/icon "📝"} examples.form
   "Login form demonstrating text-input with multiple fields and echo modes."
   (:require
    [atomstream.components.text-input :as text-input]

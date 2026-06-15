@@ -1,4 +1,4 @@
-(ns examples.sketch
+(ns ^{:atomstream/icon "🎨"} examples.sketch
   "A mouse-driven drawing pad.
    Click/drag to draw, right-click to erase, scroll to change brush.
    Demonstrates mouse interaction in charm.clj."

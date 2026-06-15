@@ -1,4 +1,4 @@
-(ns examples.download
+(ns ^{:atomstream/icon "📥"} examples.download
   "Simulated download demonstrating all progress bar styles."
   (:require
    [atomstream.components.progress :as progress]

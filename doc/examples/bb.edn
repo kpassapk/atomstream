@@ -1,7 +1,10 @@
 {:paths ["src" "../../src"]
  :deps {com.lambdaisland/launchpad {:mvn/version "0.45.201-alpha"}}
  :tasks
- {cheatsheet {:doc "Run cheatsheet example"
+ {launcher {:doc "Run the example launcher (loads examples dynamically via sci)"
+            :task (clojure "-J--enable-native-access=ALL-UNNAMED -M:sci -m examples.launcher")}
+
+  cheatsheet {:doc "Run cheatsheet example"
               :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.cheatsheet")}
 
   countdown {:doc "Run countdown example"

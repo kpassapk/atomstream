@@ -1,4 +1,4 @@
-(ns examples.cheatsheet
+(ns ^{:atomstream/icon "📚"} examples.cheatsheet
   "Clojure Cheatsheet TUI — single filterable view.
 
    All sections are shown at once. Typing filters inline, showing only

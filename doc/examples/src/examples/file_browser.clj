@@ -1,4 +1,4 @@
-(ns examples.file-browser
+(ns ^{:atomstream/icon "📂"} examples.file-browser
   "File browser demonstrating list component with a details pane."
   (:require
    [atomstream.ansi.width :as w]

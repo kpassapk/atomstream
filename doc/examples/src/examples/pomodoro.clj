@@ -1,4 +1,4 @@
-(ns examples.pomodoro
+(ns ^{:atomstream/icon "🍅"} examples.pomodoro
   "Pomodoro CLI timer with work/break cycles.
 
    Usage:
