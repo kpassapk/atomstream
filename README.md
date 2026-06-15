@@ -16,17 +16,19 @@ Atomstream is a drop-in replacement for charm.clj.
 1. In your charm.clj program, replace `charm` with `atomstream`. 
 
 ```
-(require '[atomstream.core :as charm])
+(require '[atomstream.program :as program]   ;; was charm.program — run/run-async also render to the web
+         '[atomstream.style.core :as style]  ;; was charm.style.core
+         '[atomstream.message :as msg])      ;; was charm.message
 ...
 ```
 
-2. Start the program with `charm/run` as usual. 
+2. Start the program with `program/run` as usual. 
 3. Open your browser to port 8080
 
 ## Goals
 
 1. Stay as close as possible to charm.clj
-2. Render unobtrusively to the Web (with themes perhaps?)
+2. Render correctly and unobtrusively to the Web (with themes perhaps?)
 3. Use richer Web functionality selectively
 
 ## Try it!

@@ -13,6 +13,9 @@
   download {:doc "Run download example"
             :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.download")}
 
+  emojis {:doc "Run emojis example"
+          :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.emojis")}
+
   file-browser {:doc "Run file browser example"
                 :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.file-browser")}
 
@@ -21,6 +24,9 @@
 
   pomodoro {:doc "Run pomodoro example"
             :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.pomodoro")}
+
+  sketch {:doc "Run sketch example"
+          :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.sketch")}
 
   spinner {:doc "Run spinner demo"
            :task (clojure "-J--enable-native-access=ALL-UNNAMED -M -m examples.spinner-demo")}

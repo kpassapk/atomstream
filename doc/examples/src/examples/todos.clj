@@ -1,0 +1,217 @@
+(ns examples.todos
+  "Full todo application demonstrating component composition:
+   list + text-input + help working together."
+  (:require
+   [atomstream.components.help :as help]
+   [atomstream.components.list :as item-list]
+   [atomstream.components.text-input :as text-input]
+   [atomstream.message :as msg]
+   [atomstream.program :as program]
+   [atomstream.style.core :as style]
+   [clojure.string :as str]))
+
+(def title-style
+  (style/style :fg style/magenta :bold true))
+
+(def input-style
+  (style/style :fg style/cyan))
+
+(def done-style
+  (style/style :fg 240 :strikethrough true))
+
+(def pending-style
+  (style/style :fg style/white))
+
+(def count-style
+  (style/style :fg style/yellow))
+
+(def hint-style
+  (style/style :fg 240))
+
+;; Help bindings
+(def help-bindings
+  (help/from-pairs
+   "j/k" "up/down"
+   "a" "add todo"
+   "x" "toggle done"
+   "d" "delete"
+   "?" "help"
+   "q" "quit"))
+
+(defn make-todo
+  "Create a todo item."
+  [text]
+  {:title text
+   :done false
+   :id (rand-int 1000000)})
+
+(defn todo->list-item
+  "Convert todo to list item display format."
+  [todo]
+  (let [checkbox (if (:done todo) "[x]" "[ ]")
+        style (if (:done todo) done-style pending-style)]
+    {:title (str checkbox " " (:title todo))
+     :data todo}))
+
+(defn update-list-items
+  "Update the list component with current todos."
+  [state]
+  (let [todos (:todos state)
+        items (mapv todo->list-item todos)]
+    (assoc state :todo-list (item-list/set-items (:todo-list state) items))))
+
+(defn init []
+  (let [initial-todos [(make-todo "Learn charm.clj")
+                       (make-todo "Build a TUI app")
+                       (make-todo "Have fun!")]
+        items (mapv todo->list-item initial-todos)]
+    [{:todos initial-todos
+      :todo-list (item-list/item-list items
+                                      :height 10
+                                      :cursor-prefix "> "
+                                      :item-prefix "  ")
+      :input (text-input/text-input :prompt "New todo: "
+                                    :placeholder "What needs to be done?"
+                                    :focused false)
+      :mode :browse  ; :browse or :add
+      :help (help/help help-bindings :width 60)}
+     nil]))
+
+(defn enter-add-mode
+  "Switch to add mode."
+  [state]
+  (-> state
+      (assoc :mode :add)
+      (update :input text-input/focus)))
+
+(defn exit-add-mode
+  "Switch back to browse mode."
+  [state]
+  (-> state
+      (assoc :mode :browse)
+      (update :input text-input/blur)
+      (update :input text-input/reset)))
+
+(defn add-todo
+  "Add new todo from input."
+  [state]
+  (let [text (str/trim (text-input/value (:input state)))]
+    (if (str/blank? text)
+      (exit-add-mode state)
+      (-> state
+          (update :todos conj (make-todo text))
+          exit-add-mode
+          update-list-items))))
+
+(defn toggle-selected
+  "Toggle done state of selected todo."
+  [state]
+  (let [idx (item-list/selected-index (:todo-list state))]
+    (if (and idx (< idx (count (:todos state))))
+      (-> state
+          (update-in [:todos idx :done] not)
+          update-list-items)
+      state)))
+
+(defn delete-selected
+  "Delete the selected todo."
+  [state]
+  (let [idx (item-list/selected-index (:todo-list state))]
+    (if (and idx (< idx (count (:todos state))))
+      (-> state
+          (update :todos (fn [todos]
+                           (into (subvec todos 0 idx)
+                                 (subvec todos (inc idx)))))
+          update-list-items)
+      state)))
+
+(defn update-fn [state msg]
+  (cond
+    ;; Quit (only in browse mode, or ctrl+c/esc always)
+    (or (msg/key-match? msg "ctrl+c")
+        (and (= (:mode state) :browse)
+             (msg/key-match? msg "q")))
+    [state program/quit-cmd]
+
+    ;; Escape always exits add mode or quits in browse mode
+    (msg/key-match? msg "esc")
+    (if (= (:mode state) :add)
+      [(exit-add-mode state) nil]
+      [state program/quit-cmd])
+
+    ;; In add mode
+    (= (:mode state) :add)
+    (cond
+      ;; Enter to submit
+      (msg/key-match? msg "enter")
+      [(add-todo state) nil]
+
+      ;; Pass to text input
+      :else
+      (let [[new-input cmd] (text-input/text-input-update (:input state) msg)]
+        [(assoc state :input new-input) cmd]))
+
+    ;; In browse mode
+    :else
+    (cond
+      ;; A to add new todo
+      (msg/key-match? msg "a")
+      [(enter-add-mode state) nil]
+
+      ;; X to toggle done
+      (msg/key-match? msg "x")
+      [(toggle-selected state) nil]
+
+      ;; D to delete
+      (msg/key-match? msg "d")
+      [(delete-selected state) nil]
+
+      ;; ? to toggle help
+      (msg/key-match? msg "?")
+      [(update state :help help/toggle-show-all) nil]
+
+      ;; Pass navigation to list
+      :else
+      (let [[new-list cmd] (item-list/list-update (:todo-list state) msg)]
+        [(assoc state :todo-list new-list) cmd]))))
+
+(defn count-todos
+  "Count pending and done todos."
+  [todos]
+  (let [done (count (filter :done todos))
+        pending (- (count todos) done)]
+    {:pending pending :done done :total (count todos)}))
+
+(defn view [state]
+  (let [{:keys [todos todo-list input mode help]} state
+        counts (count-todos todos)
+        show-full-help? (:show-all help)]
+    (str (style/render title-style "Todo List") "\n"
+         (style/render count-style
+                       (format "%d pending, %d done"
+                               (:pending counts)
+                               (:done counts)))
+         "\n\n"
+
+         ;; Todo list
+         (if (empty? todos)
+           (style/render hint-style "No todos yet. Press 'a' to add one!")
+           (item-list/list-view todo-list))
+         "\n\n"
+
+         ;; Input (visible in add mode)
+         (when (= mode :add)
+           (str (text-input/text-input-view input) "\n\n"))
+
+         ;; Help
+         (if show-full-help?
+           (str (style/render (style/style :bold true) "Keyboard Shortcuts") "\n"
+                (help/full-help-view help) "\n\n"
+                (style/render hint-style "Press ? to hide help"))
+           (help/short-help-view help)))))
+
+(defn -main [& _args]
+  (program/run {:init init
+                :update update-fn
+                :view view
+                :alt-screen true}))
