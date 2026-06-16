@@ -1,10 +1,26 @@
-# atomstream examples
+# Atomstream examples
 
-## Develop examples using the REPL
-
-Add to `deps.local.edn`:
+Browse examples
 
 ```
-{:launchpad/aliases [:sci]
+bb launcher
+```
+
+## Run Web-only
+
+```
+clj -J--enable-native-access=ALL-UNNAMED -M:sci -m examples.launcher --web-only
+```
+
+## Developing
+
+```
+bin/launchpad
+```
+
+You may want to add to `deps.local.edn`, if you are developing the launcher.
+
+```
+{:launchpad/aliases [:sci]}
 ```
 

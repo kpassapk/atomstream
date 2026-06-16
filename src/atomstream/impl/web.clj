@@ -5,19 +5,11 @@
             [clojure.core.async :as a]
             [hyperlith.core :as h :refer [defaction defview]]))
 
-;; ---------------------------------------------------------------------------
-;; Shared wiring (one running app per JVM, like charm/run itself)
-;; ---------------------------------------------------------------------------
-
 (defonce ^:private ext-ch_ (atom nil))   ; web -> charm event channel
 (defonce ^:private ansi_   (atom ""))    ; latest view string
 
 (defn- dispatch! [m]
   (when-let [ch @ext-ch_] (a/put! ch m)))
-
-;; ---------------------------------------------------------------------------
-;; Browser key -> charm key
-;; ---------------------------------------------------------------------------
 
 (defn- web-key->charm [k]
   ;; Browser KeyboardEvent.key -> the key strings charm's key-match? expects.
@@ -33,9 +25,6 @@
     "Shift"      :shift
     k))
 
-;; ---------------------------------------------------------------------------
-;; CSS
-;; ---------------------------------------------------------------------------
 
 (def css
   (h/static-css
@@ -85,7 +74,31 @@
     (into [:pre#screen] (ah/ansi->hiccup @ansi_))]))
 
 ;; ---------------------------------------------------------------------------
-;; run-with-web
+;; Command execution (mirrors charm.program's private execute-cmd!)
+;; ---------------------------------------------------------------------------
+
+(defn- execute-cmd!
+  "Execute a command and send the resulting message to msg-chan."
+  [cmd msg-chan]
+  (when cmd
+    (case (:type cmd)
+      :cmd   (a/go (try
+                     (when-let [r ((:fn cmd))]
+                       (a/>! msg-chan r))
+                     (catch Exception e
+                       (a/>! msg-chan (msg/error e)))))
+      :batch (doseq [c (:cmds cmd)]
+               (execute-cmd! c msg-chan))
+      :sequence (a/go (doseq [c (:cmds cmd)]
+                        (try
+                          (when-let [r ((:fn c))]
+                            (a/>! msg-chan r))
+                          (catch Exception e
+                            (a/>! msg-chan (msg/error e))))))
+      nil)))
+
+;; ---------------------------------------------------------------------------
+;; Running
 ;; ---------------------------------------------------------------------------
 
 (defn run-with-web
@@ -113,3 +126,85 @@
         (finally
           (a/close! ext-ch)
           ((:stop web)))))))
+
+(defn run-web-only
+  "Run a charm-style app with only the web frontend — no JLine terminal.
+   Blocks until the app quits. Returns final state.
+
+   Accepts same opts as run-with-web plus:
+     :width   - virtual terminal width  (default 80)
+     :height  - virtual terminal height (default 24)"
+  [{:keys [init update view port width height]
+    :or   {port 8080 width 80 height 24}}]
+  (let [msg-chan (a/chan 256)
+        ext-ch  (a/chan 256)
+        running? (atom true)
+
+        ;; Forward web events into msg-chan.
+        ;; a/<!! returns nil on closed channel, ending the loop naturally.
+        fwd-thread (doto (Thread.
+                          (fn []
+                            (loop []
+                              (when-let [m (a/<!! ext-ch)]
+                                (a/put! msg-chan m)
+                                (recur)))))
+                     (.setDaemon true)
+                     (.start))
+
+        ;; Wire up web event channel
+        _ (reset! ext-ch_ ext-ch)
+
+        ;; Init
+        init-result (if (fn? init) (init) [init nil])
+        [initial-state init-cmd] (if (vector? init-result)
+                                   init-result
+                                   [init-result nil])
+        state (atom initial-state)
+
+        ;; Render helper
+        render! (fn [s]
+                  (let [out (view s)]
+                    (reset! ansi_ out)
+                    (h/refresh-all!)))
+
+        ;; Start web server
+        web (h/start-app {:ctx-start (fn [] {})
+                          :ctx-stop  (fn [_] nil)
+                          :port      port})]
+    (try
+      ;; Execute init command
+      (execute-cmd! init-cmd msg-chan)
+
+      ;; Send initial window size
+      (a/put! msg-chan (msg/window-size width height))
+
+      ;; Render initial view
+      (render! @state)
+
+      ;; Event loop
+      (loop []
+        (when @running?
+          (a/<!! (a/timeout 10))
+          (when-let [m (a/poll! msg-chan)]
+            (cond
+              (msg/quit? m)
+              (reset! running? false)
+
+              (= :error (:type m))
+              (do (reset! running? false)
+                  (throw (:error m)))
+
+              :else
+              (let [[new-state cmd] (update @state m)]
+                (reset! state new-state)
+                (execute-cmd! cmd msg-chan)
+                (render! new-state))))
+          (when @running? (recur))))
+
+      @state
+
+      (finally
+        (reset! running? false)
+        (a/close! ext-ch)
+        (a/close! msg-chan)
+        ((:stop web))))))

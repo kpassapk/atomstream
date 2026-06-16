@@ -29,3 +29,9 @@
       (.start))
     {:quit!  (fn [] (reset! running? false))
      :result result}))
+
+(defn run-web-only
+  "Run app with web frontend only — no terminal. Blocks until quit.
+   Accepts same opts as run plus :width/:height for virtual terminal size."
+  [opts]
+  (web/run-web-only opts))

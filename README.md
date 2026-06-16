@@ -2,7 +2,7 @@
 
 TUIs are easy and fun to code, but they are not easy to share with friends or colleagues. It is also hard to implement accessibility features for TUIs.
 
-Atomstream is a drop-in replacement for [charm.clj][charm], which also renders to the Web with [hyperlith][hyperlith].
+Atomstream is a drop-in replacement for [charm.clj][charm], which also renders to the Web with [hyperlith][hyperlith]. It lets you code for the terminal, and share on the Web.
 
 [charm]: https://github.com/TimoKramer/charm.clj
 [hyperlith]: https://github.com/andersmurphy/hyperlith
@@ -14,7 +14,7 @@ Atomstream is a drop-in replacement for [charm.clj][charm], which also renders t
 1. In your charm.clj program, replace `charm` with `atomstream`:
 
 ```
-(require '[atomstream.program :as program]   ;; was charm.program — run/run-async also render to the web
+(require '[atomstream.program :as program]   ;; was charm.program
          '[atomstream.style.core :as style]  ;; was charm.style.core
          '[atomstream.message :as msg])      ;; was charm.message
 ...
@@ -47,9 +47,30 @@ bb tasks
 bb cheatsheet       # etc
 ```
 
+## Web-only
+
+You can use Atomstream to run a TUI without a TUI, if that makes any sense!
+
+Use `atomstream.program/run-web-only` to start the application without a terminal interface. (The Web view will, of course, still look and act like a terminal.) This is useful for running the program on a server.
+
+You will probably want to load many small programs dynamically: see the [launcher][doc/examples/src/examples/launcher.clj] example for how to do this using [sci][sci].
+
+[sci]: https://github.com/babashka/sci
+
+## REPL Development
+
+```
+bin/launchpad
+```
+
+Use `atomstream.program/run-async` as described in the [corresponding section](https://github.com/TimoKramer/charm.clj#repl-development) for 
+charm.clj.
+
+See also [launchpad](https://github.com/lambdaisland/launchpad) for more.
+
 # Roadmap
 - Mouse support
+- Accessibility
 - Web-native components such as dropdowns?
 - Themes
-- CLI
 - (Maybe) custom components with special rendering for the Web

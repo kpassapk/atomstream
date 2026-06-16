@@ -326,14 +326,16 @@
 ;; Main
 ;; ---------------------------------------------------------------------------
 
-(defn- run-launcher []
-  (program/run {:init init :update update-fn :view view :alt-screen true}))
+(defn- run-launcher [run-fn]
+  (run-fn {:init init :update update-fn :view view :alt-screen true}))
 
-(defn -main [& _args]
-  (loop []
-    (let [final (run-launcher)]
-      (when (= :run (:action final))
-        (if-let [opts (load-app (:selected final))]
-          (program/run opts)
-          (println "Example" (:ns (:selected final)) "did not start (needs CLI args?)"))
-        (recur)))))
+(defn -main [& args]
+  (let [web-only? (some #{"--web-only"} args)
+        run-fn    (if web-only? program/run-web-only program/run)]
+    (loop []
+      (let [final (run-launcher run-fn)]
+        (when (= :run (:action final))
+          (if-let [opts (load-app (:selected final))]
+            (run-fn opts)
+            (println "Example" (:ns (:selected final)) "did not start (needs CLI args?)"))
+          (recur))))))
