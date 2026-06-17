@@ -1,10 +1,15 @@
-# 1. Screen-reader accessibility via web ARIA
+# 1. Screen-reader accessibility POC via web ARIA
 
 Date: 2026-06-17
 
 ## Status
 
 Proposed
+
+## Scope
+
+This ADR covers the todo-list example as the first target. Generalising the
+accessibility model across all mirrored components is deferred.
 
 ## Context
 
@@ -24,17 +29,12 @@ use.
 
 Key constraints discovered:
 
-- **ARIA is an HTML-only mechanism.** It can only exist on the web render path.
-  Terminal screen readers read the raw TTY and cannot consume ARIA, so the
-  accessible experience targets the web view only. (Terminal accessibility would
-  be a separate mechanism — a spoken-text output stream — and is explicitly out
-  of scope here.)
-- **The `<pre>` blob is the core problem.** Today the whole UI is one
-  ANSI→HTML `<pre>`. A screen reader reads it as one undifferentiated wall of
-  text: no list semantics, no per-item state, no announcements on change.
-- **An ANSI string is flat.** It carries no structure on which to hang ARIA
-  attributes. The structure (which items exist, which is selected, which are
-  checked) has been thrown away by the time we have the string.
+- ARIA is an HTML-only mechanism
+- The whole UI is one ANSI→HTML `<pre>`. A screen reader reads it as
+  one undifferentiated wall of text: no list semantics, no per-item
+  state, no announcements on change.
+- An ANSI string is flat. It carries no structure on which to hang ARIA
+  attributes. 
 - The data needed to rebuild that structure already exists in component state:
   the list component tracks `selected-index`; the todo model tracks `:done`; the
   `:todos` vector gives item order, count, and position.
@@ -153,8 +153,3 @@ both firing):
      but generic wording (e.g. just "checked").
 - Whether the a11y model is a formal protocol on components or plain map metadata.
 - Scope of components beyond `list` (table, text-input, viewport) in later work.
-
-## Scope
-
-This ADR covers the todo-list example as the first target. Generalising the
-accessibility model across all mirrored components is deferred.
