@@ -53,7 +53,7 @@ You can use Atomstream to run a TUI without a TUI, if that makes any sense!
 
 Use `atomstream.program/run-web-only` to start the application without a terminal interface. (The Web view will, of course, still look and act like a terminal.) This is useful for running the program on a server.
 
-You will probably want to load many small programs dynamically: see the [launcher][doc/examples/src/examples/launcher.clj] example for how to do this using [sci][sci].
+You will probably want to load many small programs dynamically: see the [launcher](doc/examples/src/examples/launcher.clj) example for how to do this using [sci][sci].
 
 [sci]: https://github.com/babashka/sci
 

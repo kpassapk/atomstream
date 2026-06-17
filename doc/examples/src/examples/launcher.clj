@@ -339,3 +339,15 @@
             (run-fn opts)
             (println "Example" (:ns (:selected final)) "did not start (needs CLI args?)"))
           (recur))))))
+
+(comment
+  ; "Start the cheatsheet app in the background. Returns a handle:
+  ;    {:quit!  (fn [] ...) - stop the app
+  ;     :result (promise)   - deref to get the final state}"
+  ; []
+  (def app (program/run-async {:init init
+                               :update update-fn
+                               :view view
+                               :alt-screen true}))
+  ((:quit! app))
+  ,)

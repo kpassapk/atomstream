@@ -100,6 +100,15 @@
 ;; Public
 ;; ---------------------------------------------------------------------------
 
+(defn ansi->plain
+  "Strip ANSI escapes from a charm view string, returning just the text.
+   Used to diff successive views for screen-reader announcements."
+  [s]
+  (->> (p/split-ansi s)
+       (filter #(= :text (:type %)))
+       (map :content)
+       str/join))
+
 (defn ansi->hiccup
   "Turn a charm view string into a seq of hiccup nodes (plain strings and
    styled <span>s) suitable for dropping inside a <pre>."
